@@ -15,8 +15,8 @@ import pandas as pd
 import os
 import sqlite3
 
-oweather_key = 'oweather key'
-oweather_city = 'location'
+oweather_key = conf['oweather_key']
+oweather_city = conf['oweather_city']
 oweather_call = "http://api.openweathermap.org/data/2.5/weather?id=" + oweather_city + "&units=metric&appid=" + oweather_key
 
 INTERVAL = 600
@@ -41,10 +41,25 @@ def dbClose(conn):
     conn.commit()
     conn.close()
 
-conn, cursor = dbConnect('weather.db')
-loop = True
 
-loc = int(oweather_city)
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-c", "--conf", required=True,
+    help="usage: python3 weather.py --conf [file.json]")
+args = vars(ap.parse_args())
+warnings.filterwarnings("ignore")
+conf = json.load(open(args["conf"]))
+
+# Define www.openweather.com web call
+oweather_key = conf['oweather_key']
+oweather_city = conf['oweather_city']
+oweather_call = "http://api.openweathermap.org/data/2.5/weather?id=" + oweather_city + "&units=metric&appid=" + oweather_key
+
+# Open DB
+conn, cursor = dbConnect('weather.db')
+
+# Initialize loop
+loop = True
 
 while loop:
     print ('Requesting wheater report...')
