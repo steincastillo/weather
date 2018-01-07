@@ -5,22 +5,17 @@ Created on Thu Jan  4 23:23:06 2018
 @author: stein
 """
 
-
+# Import libraries
 import json
 import datetime
+from datetime import timedelta
 import time
+import os
+import argparse
 from requests import get
 import numpy as numpy
 import pandas as pd
-import os
 import sqlite3
-
-oweather_key = conf['oweather_key']
-oweather_city = conf['oweather_city']
-oweather_call = "http://api.openweathermap.org/data/2.5/weather?id=" + oweather_city + "&units=metric&appid=" + oweather_key
-
-INTERVAL = 600
-loop = True
 
 # Database management functions
 
@@ -41,33 +36,41 @@ def dbClose(conn):
     conn.commit()
     conn.close()
 
-
-
+# Parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--conf", required=True,
     help="usage: python3 weather.py --conf [file.json]")
 args = vars(ap.parse_args())
-warnings.filterwarnings("ignore")
 conf = json.load(open(args["conf"]))
 
 # Define www.openweather.com web call
 oweather_key = conf['oweather_key']
 oweather_city = conf['oweather_city']
-oweather_call = "http://api.openweathermap.org/data/2.5/weather?id=" + oweather_city + "&units=metric&appid=" + oweather_key
+oweather_call = "http://api.openweathermap.org/data/2.5/weather?id=" + \
+                oweather_city + "&units=metric&appid=" + oweather_key
 
 # Open DB
 conn, cursor = dbConnect('weather.db')
 
 # Initialize loop
+INTERVAL = conf['interval']
+INTERVAL = 10
 loop = True
+reading = 0
 
 while loop:
-    print ('Requesting wheater report...')
+    reading += 1
+    print ('Reading no. {}'.format(reading))
+    print ('Requesting weather report...')
+    #weather = get(oweather_call).json()
     tstamp = datetime.datetime.now().strftime('%c')
-    weather = get(oweather_call).json()
-    temp = weather['main']['temp']
-    press = weather['main']['pressure']
-    hum = weather['main']['humidity']
+    #temp = weather['main']['temp']
+    #press = weather['main']['pressure']
+    #hum = weather['main']['humidity']
+    
+    temp = 7.5
+    press = 1000
+    hum = 60
     
     print ('Report received...')
     print ('Time: {}'.format(tstamp))
@@ -77,15 +80,16 @@ while loop:
     
     print ('Saving data into DB...')
     print ('**********************')
-
     
-    row = (loc, tstamp, temp, hum, press)
+    # Save data into DB
+    row = (oweather_city, tstamp, temp, hum, press)
     sql = 'INSERT INTO weather (location, date, temperature, humidity, pressure) \
         VALUES (?, ?, ?, ?, ?)'
     cursor.execute(sql, row)
     conn.commit()
     
-    print ('Waiting for next iteration...')
+    nextread = datetime.datetime.now() + timedelta(seconds=INTERVAL)
+    print ('Next reading at: {} '.format(nextread))
     time.sleep(INTERVAL)
     
     

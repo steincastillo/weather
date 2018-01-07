@@ -6,7 +6,9 @@ Created on Fri Jan  5 00:13:41 2018
 """
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.dates as md
 import time
+from datetime import datetime
 import sqlite3
 import pandas as pd
 import os
@@ -42,19 +44,26 @@ c = conn.cursor()
 
 def animate(i):
     data = pd.read_sql_query(sql, conn)
+    #data = data[(len(data)-10):]
     xlist = []
     ylist = []
     for row in range(len(data)):
         x = data['date'][row]
+        x = datetime.strptime(x, '%a %b %d %H:%M:%S %Y')
         y = data['temperature'][row]
         xlist.append(x)
         ylist.append(y)
+    print ('updating chart...')
     ax1.clear()
     ax1.set_title('Temperature Monitor')
     ax1.set_xlabel('Date/Time')
     ax1.set_ylabel('Temp (C)')
     ax1.grid(b=True, linestyle='dashed', color='grey')
-    fig.autofmt_xdate()
+    xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
+    ax1.xaxis.set_major_formatter(xfmt)
+    plt.xticks(rotation=30)
+    #fig.autofmt_xdate()
     ax1.plot(xlist, ylist, lw=2)
     
 ani = animation.FuncAnimation(fig, animate, interval=5000)
+plt.show()
