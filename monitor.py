@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.dates as md
 import time
-from datetime import datetime
+import datetime
 import sqlite3
 import pandas as pd
 import os
@@ -37,6 +37,7 @@ fig, ax1 = plt.subplots()
 
 
 sql = 'SELECT * FROM weather;'
+interval = 120000
 
 # Open DB read only mode
 conn = sqlite3.connect('file:weather.db?mode=ro', uri=True)
@@ -49,11 +50,11 @@ def animate(i):
     ylist = []
     for row in range(len(data)):
         x = data['date'][row]
-        x = datetime.strptime(x, '%a %b %d %H:%M:%S %Y')
+        x = datetime.datetime.strptime(x, '%a %b %d %H:%M:%S %Y')
         y = data['temperature'][row]
         xlist.append(x)
         ylist.append(y)
-    print ('updating chart...')
+    print ('updating chart...{}'.format(datetime.datetime.now()))
     ax1.clear()
     ax1.set_title('Temperature Monitor')
     ax1.set_xlabel('Date/Time')
@@ -65,5 +66,5 @@ def animate(i):
     #fig.autofmt_xdate()
     ax1.plot(xlist, ylist, lw=2)
     
-ani = animation.FuncAnimation(fig, animate, interval=5000)
+ani = animation.FuncAnimation(fig, animate, interval=interval)
 plt.show()

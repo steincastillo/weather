@@ -54,7 +54,7 @@ conn, cursor = dbConnect('weather.db')
 
 # Initialize loop
 INTERVAL = conf['interval']
-INTERVAL = 10
+#INTERVAL = 10
 loop = True
 reading = 0
 
@@ -62,15 +62,15 @@ while loop:
     reading += 1
     print ('Reading no. {}'.format(reading))
     print ('Requesting weather report...')
-    #weather = get(oweather_call).json()
+    weather = get(oweather_call).json()
     tstamp = datetime.datetime.now().strftime('%c')
-    #temp = weather['main']['temp']
-    #press = weather['main']['pressure']
-    #hum = weather['main']['humidity']
+    temp = weather['main']['temp']
+    press = weather['main']['pressure']
+    hum = weather['main']['humidity']
     
-    temp = 7.5
-    press = 1000
-    hum = 60
+    #temp = 7.5
+    #press = 1000
+    #hum = 60
     
     print ('Report received...')
     print ('Time: {}'.format(tstamp))
