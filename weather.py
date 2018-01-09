@@ -83,31 +83,35 @@ if __name__ == '__main__':
         reading += 1
         print ('Reading no. {}'.format(reading))
         print ('Requesting weather report...')
-        weather = get(oweather_call).json()
-        tstamp = datetime.datetime.now().strftime('%c')
-        temp = weather['main']['temp']
-        press = weather['main']['pressure']
-        hum = weather['main']['humidity']
-        
-        #temp = 7.5
-        #press = 1000
-        #hum = 60
-        
-        print ('Report received...')
-        print ('Time: {}'.format(tstamp))
-        print ('temperature: {}'.format(temp))
-        print ('Pressure: {}'.format(press))
-        print ('Humidity: {}'.format(hum))
-        
-        print ('Saving data into DB...')
-        print ('**********************')
-        
-        # Save data into DB
-        row = (oweather_city, tstamp, temp, hum, press)
-        sql = 'INSERT INTO weather (location, date, temperature, humidity, pressure) \
-            VALUES (?, ?, ?, ?, ?)'
-        cursor.execute(sql, row)
-        conn.commit()
+        try:
+            weather = get(oweather_call).json()
+            tstamp = datetime.datetime.now().strftime('%c')
+            temp = weather['main']['temp']
+            press = weather['main']['pressure']
+            hum = weather['main']['humidity']
+            
+            #temp = 7.5
+            #press = 1000
+            #hum = 60
+            
+            print ('Report received...')
+            print ('City: {}'.format(weather['name']))
+            print ('Country: {}'.format(weather['sys']['country']))
+            print ('Time: {}'.format(tstamp))
+            print ('temperature: {}'.format(temp))
+            print ('Pressure: {}'.format(press))
+            print ('Humidity: {}'.format(hum))
+            print ('Saving data into DB...')
+            print ('**********************')
+            
+            # Save data into DB
+            row = (oweather_city, tstamp, temp, hum, press)
+            sql = 'INSERT INTO weather (location, date, temperature, humidity, pressure) \
+                VALUES (?, ?, ?, ?, ?)'
+            cursor.execute(sql, row)
+            conn.commit()
+        except:
+            print('[ERROR]: Report not received. Will try again later')
         
         nextread = datetime.datetime.now() + timedelta(seconds=INTERVAL)
         print ('Next reading at: {} '.format(nextread))
