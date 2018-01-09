@@ -98,7 +98,7 @@ if __name__ == '__main__':
     ap.add_argument("-a",
                     "--animate",
                     required = False,
-                    default = False, 
+                    default = True, 
                     type = str2bool,
                     help ="Enable live update: [yes|no]")
     args = vars(ap.parse_args())
