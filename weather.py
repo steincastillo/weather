@@ -21,16 +21,26 @@ determined location and saves the results in a SQLite database
 """
 
 # Import libraries
+
+import sqlite3
 import json
 import datetime
-from datetime import timedelta
-import time
 import os
 import argparse
-from requests import get
 import numpy as np
 import pandas as pd
-import sqlite3
+import signal
+from datetime import timedelta
+import time
+from requests import get
+
+
+# Define functions
+
+def handler(signum, frame):
+    print ('\n[MSG] CTRL+C received. Exiting.')
+    dbClose(conn)
+    exit(0)
 
 # Database management functions
 
@@ -50,7 +60,6 @@ def dbClose(conn):
     
     conn.commit()
     conn.close()
-
 
 # Main loop
 
@@ -78,6 +87,9 @@ if __name__ == '__main__':
     #INTERVAL = 10
     loop = True
     reading = 0
+    # Set CTRL+C capture event
+    print ('Initiating weather sampling. Press Ctrl+C to finish')
+    signal.signal(signal.SIGINT, handler)
     
     while loop:
         reading += 1
