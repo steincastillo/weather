@@ -61,9 +61,9 @@ def dbClose(conn):
 # Define functions
 
 def str2bool(v):
-    if v.lower() in ('yes', 'true', 't', '1'):
+    if v.lower() in ('yes', 'true', 't', '1', 'y', 'T'):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif v.lower() in ('no', 'false', 'f', 'F', 'n', '0'):
         return False
     else:
         return False

@@ -83,7 +83,7 @@ if __name__ == '__main__':
     conn, cursor = dbConnect('weather.db')
     
     # Initialize loop
-    INTERVAL = conf['interval']
+    INTERVAL = conf['read_interval']
     #INTERVAL = 10
     loop = True
     reading = 0
