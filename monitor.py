@@ -20,6 +20,7 @@ Usage:
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.dates as md
+import numpy as np
 import time
 import datetime
 import argparse
@@ -72,24 +73,32 @@ def animate(i):
     """ Animates the temperature chart """
     
     data = pd.read_sql_query(sql, conn)
-    xlist = []
-    ylist = []
+    xlist = []  # Date
+    y1list = [] # Temperature
+    y2list = [] # Pressure
+    y3list = [] # Humidity
     for row in range(len(data)):
         x = data['date'][row]
         x = datetime.datetime.strptime(x, '%a %b %d %H:%M:%S %Y')
-        y = data['temperature'][row]
+        y1 = data['temperature'][row]
+        y2 = data['pressure'][row]
         xlist.append(x)
-        ylist.append(y)
+        y1list.append(y1)
+        y2list.append(y2)
     print ('[MSG] Updating chart...{}'.format(datetime.datetime.now()))
     ax1.clear()
-    ax1.set_title('Temperature Monitor')
-    ax1.set_xlabel('Date/Time')
+    ax2.clear()
+    ax1.set_title('Temperature')
+    ax2.set_title('Pressure')
     ax1.set_ylabel('Temp (C)')
+    ax2.set_ylabel('mmHg')
     ax1.grid(b=True, linestyle='dashed', color='grey')
+    ax2.grid(b=True, linestyle='dashed', color='grey')
     xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
-    ax1.xaxis.set_major_formatter(xfmt)
     plt.xticks(rotation=30)
-    ax1.plot(xlist, ylist, lw=2)
+    ax1.xaxis.set_major_formatter(xfmt)
+    ax1.plot(xlist, y1list, lw=2)
+    ax2.plot(xlist, y2list, lw=2)
 
 # Main loop
 if __name__ == '__main__':
@@ -106,7 +115,7 @@ if __name__ == '__main__':
     # Open DB read only mode
     conn, cursor = dbConnectRead('weather.db')
     
-    fig, ax1 = plt.subplots()
+    fig, (ax1, ax2) = plt.subplots(2, sharex=True)
     
     sql = 'SELECT * FROM weather;'
     interval = 120000
@@ -119,26 +128,33 @@ if __name__ == '__main__':
         plt.show()
     else:
         data = pd.read_sql_query(sql, conn)
-        xlist = []
-        ylist = []
+        xlist = []  # Date
+        y1list = [] # Temperature
+        y2list = [] # Pressure
+        y3list = [] # Humidity
         for row in range(len(data)):
             x = data['date'][row]
             x = datetime.datetime.strptime(x, '%a %b %d %H:%M:%S %Y')
-            y = data['temperature'][row]
+            y1 = data['temperature'][row]
+            y2 = data['pressure'][row]
             xlist.append(x)
-            ylist.append(y)
+            y1list.append(y1)
+            y2list.append(y2)
         print ('[MSG] Static chart displayed. Live update disabled')
         print ('*************************') 
         
-        # Draw statc chart
-        ax1.set_title('Temperature Monitor')
-        ax1.set_xlabel('Date/Time')
+        # Draw static chart
+        ax1.set_title('Temperature')
+        ax2.set_title('Pressure')
         ax1.set_ylabel('Temp (C)')
+        ax2.set_ylabel('mmHg')
         ax1.grid(b=True, linestyle='dashed', color='grey')
+        ax2.grid(b=True, linestyle='dashed', color='grey')
         xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
         ax1.xaxis.set_major_formatter(xfmt)
         plt.xticks(rotation=30)
-        ax1.plot(xlist, ylist, lw=2)
+        ax1.plot(xlist, y1list, lw=2)
+        ax2.plot(xlist, y2list, lw=2)
         plt.show()
         
     # Close the database
